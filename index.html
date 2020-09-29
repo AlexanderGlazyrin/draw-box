@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<!--    <link rel="stylesheet" href="style.css">-->
+    <title>Document</title>
+</head>
+<body>
+<canvas id="canvas" style="display: block"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+    const socket = io();
+    const canvas = document.querySelector('#canvas');
+    const ctx = canvas.getContext('2d');
+    let isMouseDown = false;
+    const coords = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    canvas.addEventListener('mousedown', () => {
+        isMouseDown = true;
+    })
+
+    canvas.addEventListener('mouseup', () => {
+        isMouseDown = false;
+        ctx.beginPath();
+        socket.emit('mouseup');
+    })
+
+    ctx.lineWidth = 10;
+    canvas.addEventListener('mousemove', (e) => {
+        ctx.fillStyle = 'blue';
+        ctx.strokeStyle = 'blue';
+        if (isMouseDown) {
+            const x = e.clientX;
+            const y = e.clientY;
+            socket.emit('draw', { x, y });
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+    })
+
+    socket.on('draw', (coords) => {
+        const { x, y } = coords;
+
+        socket.on('mouseup', () => {
+            ctx.beginPath();
+        });
+
+        ctx.fillStyle = 'blue';
+        ctx.strokeStyle = 'blue';
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    });
+
+</script>
+</body>
+</html>
