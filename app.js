@@ -3,19 +3,28 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const path = require('path')
 
-const allCoords = [];
+let allCoords = [];
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 })
 
 io.on('connection', (socket) => {
+    socket.emit('newClientConnect', allCoords);
+
     socket.on('draw', (coords) => {
+        allCoords.push(coords);
         socket.broadcast.emit('draw', coords);
     })
 
     socket.on('mouseup', () => {
+        allCoords.push('mouseup');
         socket.broadcast.emit('mouseup')
+    })
+
+    socket.on('clear', () => {
+        allCoords = [];
+        socket.broadcast.emit('clear')
     })
 });
 

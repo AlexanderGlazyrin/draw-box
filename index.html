@@ -16,10 +16,41 @@
     const canvas = document.querySelector('#canvas');
     const ctx = canvas.getContext('2d');
     let isMouseDown = false;
-    const coords = [];
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    ctx.lineWidth = 10;
+    ctx.fillStyle = 'blue';
+    ctx.strokeStyle = 'blue';
+
+    function painting(x, y) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    function clear() {
+        const originColor = ctx.fillStyle;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.fillStyle = originColor;
+    }
+
+    window.addEventListener('keypress', (e) => {
+       if (e.code === 'KeyD') {
+           clear();
+           socket.emit('clear');
+       }
+    });
 
     canvas.addEventListener('mousedown', () => {
         isMouseDown = true;
@@ -31,23 +62,12 @@
         socket.emit('mouseup');
     })
 
-    ctx.lineWidth = 10;
     canvas.addEventListener('mousemove', (e) => {
-        ctx.fillStyle = 'blue';
-        ctx.strokeStyle = 'blue';
         if (isMouseDown) {
             const x = e.clientX;
             const y = e.clientY;
             socket.emit('draw', { x, y });
-            ctx.lineTo(x, y);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            painting(x, y);
         }
     })
 
@@ -57,21 +77,23 @@
         socket.on('mouseup', () => {
             ctx.beginPath();
         });
-
-        ctx.fillStyle = 'blue';
-        ctx.strokeStyle = 'blue';
-
-        ctx.lineTo(x, y);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+        painting(x, y);
     });
 
+    socket.on('newClientConnect', (allCoords) => {
+        allCoords.forEach((coords) => {
+            console.log(typeof coords);
+            if (typeof coords === 'object') {
+                painting(coords.x, coords.y)
+            } else {
+                ctx.beginPath();
+            }
+        })
+    })
+
+    socket.on('clear', () => {
+        clear();
+    })
 </script>
 </body>
 </html>
