@@ -1,13 +1,17 @@
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const path = require('path')
+// const path = require('path')
+const cors = require('cors');
 
 let allCoords = [];
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    // res.sendFile(path.join(__dirname, 'index.html'));
+    res.send('ok')
 })
+
+app.use(cors);
 
 io.on('connection', (socket) => {
     socket.emit('newClientConnect', allCoords);
