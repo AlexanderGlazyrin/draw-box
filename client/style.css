@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+}
+
+#cont {
+    display: flex;
+    justify-content: center;
+}
+
+#canvas {
+    background-color: white;
+    display: block;
+    border-radius: 5px;
+}
