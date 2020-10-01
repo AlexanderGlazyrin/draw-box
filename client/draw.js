@@ -1,7 +1,6 @@
 const socket = io('http://localhost:3000');
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
-const brushBtn = document.querySelector('#brush');
 const brushSet = document.querySelector('#brush-set');
 const btnOk = document.querySelector('.btn-ok');
 const btnCancel = document.querySelector('.btn-cancel');
@@ -9,6 +8,12 @@ const colors = document.querySelectorAll('.color');
 const selectSize = document.querySelector('.select-size');
 const colorsBox = document.querySelector('#colors');
 const check = document.querySelector('.check');
+const navWrap = document.querySelector('.nav-wrapper');
+const paintingUser = document.querySelector('.painting-user');
+const formsRegAuth = document.querySelector('#reg-auth');
+const regForm = document.querySelector('.signup-form');
+const authForm = document.querySelector('.signin-form');
+let currentUser = 'Unknown user';
 let isMouseDown = false;
 
 canvas.width = 1300;
@@ -21,8 +26,21 @@ ctx.lineWidth = sizeofbrush;
 ctx.fillStyle = colorBrush;
 ctx.strokeStyle = colorBrush;
 
-function painting(x, y) {
+function tog(...elems) {
+    elems.forEach((el) => {
+       el.classList.toggle('show');
+       el.classList.toggle('hide');
+    });
+}
 
+function hide(...elems) {
+    elems.forEach((el) => {
+        el.classList.remove('show');
+        el.classList.add('hide');
+    });
+}
+
+function painting(x, y) {
     ctx.lineWidth = sizeofbrush;
     ctx.fillStyle = colorBrush;
     ctx.strokeStyle = colorBrush;
@@ -41,24 +59,51 @@ function clear() {
     const originColor = ctx.fillStyle;
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.beginPath();
     ctx.fillStyle = originColor;
 }
 
-brushBtn.addEventListener('click', (e) => {
-    brushSet.classList.remove('hide');
-    brushSet.classList.add('show');
+if (regForm) {
+    regForm.addEventListener('submit',  (e) => {
+        e.preventDefault();
+
+        const {
+            username: { value: username },
+            password: { value: password }
+        } = e.target;
+
+        socket.emit('reg', { username, password })
+    });
+}
+
+if (authForm) {
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const {
+            username: { value: username },
+            password: { value: password }
+        } = e.target;
+
+        socket.emit('auth', { username, password })
+    });
+}
+
+navWrap.addEventListener('click', (e) => {
+    if (e.target.classList.contains('brush')) {
+        tog(brushSet);
+    }
+    if (e.target.classList.contains('reg-auth-btn')) {
+        tog(formsRegAuth);
+    }
 });
 
 btnCancel.addEventListener('click', () => {
-    brushSet.classList.remove('show');
-    brushSet.classList.add('hide');
+    tog(brushSet);
 });
 
 btnOk.addEventListener('click', () => {
-    brushSet.classList.remove('show');
-    brushSet.classList.add('hide');
+    tog(brushSet);
     sizeofbrush = +selectSize.value;
 })
 
@@ -78,10 +123,7 @@ colorsBox.addEventListener('click', (e) => {
 })
 
 document.addEventListener('DOMContentLoaded', function() {
-    const sidenav = document.querySelectorAll('.sidenav');
-    const instances = M.Sidenav.init(sidenav);
-    const select = document.querySelectorAll('select');
-    const instances2 = M.FormSelect.init(select);
+    M.AutoInit();
 });
 
 window.addEventListener('keypress', (e) => {
@@ -106,17 +148,20 @@ canvas.addEventListener('mousemove', (e) => {
         const x = e.pageX - canvasCoords.left;
         const y = e.pageY - canvasCoords.top;
 
-        socket.emit('draw', { x, y, color: colorBrush, size: sizeofbrush });
+        socket.emit('draw', { x, y, color: colorBrush, size: sizeofbrush, user: currentUser });
         painting(x, y);
     }
 })
 
 socket.on('draw', (coords) => {
-    const { x, y, color, size } = coords;
+    const { x, y, color, size, user } = coords;
     colorBrush = color;
     sizeofbrush = size;
+    paintingUser.style.color = color;
+    paintingUser.innerHTML = `${user} is painting...`
 
     socket.on('mouseup', () => {
+        paintingUser.innerHTML = '';
         ctx.beginPath();
     });
     painting(x, y);
@@ -136,4 +181,15 @@ socket.on('newClientConnect', (allCoords) => {
 
 socket.on('clear', () => {
     clear();
+})
+
+socket.on('err', (err) => {
+    if (err === 'regErr') {
+        alert('Пользователь с таким именем уже существует')
+    }
+});
+
+socket.on('ok', (name) => {
+    currentUser = name;
+    tog(formsRegAuth);
 })
