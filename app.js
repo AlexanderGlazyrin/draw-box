@@ -22,7 +22,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('mouseup', () => {
-        allCoords.push('mouseup');
+        allCoords.push(false);
         socket.broadcast.emit('mouseup')
     })
 
