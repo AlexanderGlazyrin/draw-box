@@ -69,10 +69,22 @@ if (regForm) {
 
         const {
             username: { value: username },
-            password: { value: password }
+            password: { value: password },
+            method
         } = e.target;
 
-        socket.emit('reg', { username, password })
+        fetch('http://localhost:3000/reg', {
+            method,
+            headers: {'Content-type': 'Application/json'},
+            body: JSON.stringify({ username, password })
+        }).then((us) => {
+            return us.json();
+        }).then((us) => {
+            currentUser = us.username;
+        })
+        tog(formsRegAuth);
+
+        // socket.emit('reg', { username, password })
     });
 }
 
@@ -82,10 +94,21 @@ if (authForm) {
 
         const {
             username: { value: username },
-            password: { value: password }
+            password: { value: password },
+            method
         } = e.target;
 
-        socket.emit('auth', { username, password })
+        fetch('http://localhost:3000/auth', {
+            method,
+            headers: {'Content-type': 'Application/json'},
+            body: JSON.stringify({ username, password })
+        }).then((us) => {
+            return us.json();
+        }).then((us) => {
+            currentUser = us.username;
+        })
+        tog(formsRegAuth);
+        // socket.emit('auth', { username, password })
     });
 }
 
@@ -189,7 +212,9 @@ socket.on('err', (err) => {
     }
 });
 
-socket.on('ok', (name) => {
-    currentUser = name;
-    tog(formsRegAuth);
-})
+// socket.on('ok', (name) => {
+//     currentUser = name;
+//     tog(formsRegAuth);
+// })
+
+socket.on('test' , (username) => console.log(username))
