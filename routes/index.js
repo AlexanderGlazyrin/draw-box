@@ -1,0 +1,28 @@
+const router = require('express').Router();
+const User = require('../models/user');
+
+router.get('/', (req, res) =>{
+    res.render('index');
+})
+
+router.post('/auth', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({username})
+    req.session.user = user;
+
+    res.json(req.session.user);
+})
+
+router.post('/reg', async (req, res) => {
+    const { username, password } = req.body;
+    const user = new User({
+        username,
+        password,
+    })
+    await user.save();
+    req.session.user = user;
+
+    res.json(req.session.user);
+})
+
+module.exports = router;

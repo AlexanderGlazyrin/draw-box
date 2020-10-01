@@ -1,88 +1,65 @@
 const app = require('express')();
-const express = require('express');
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose');
-const session = require('express-session')
-const FileStore = require('session-file-store')(session);
+const useMiddleware = require('./middleware/index')
+const Drawing = require('./models/drawing')
 // const sharedsession = require("express-socket.io-session");
-const cookieParser = require('cookie-parser');
-const User = require('./models/user');
-const cors = require('cors');
 
 const port = process.env.PORT || 3000;
-let allCoords = [];
+let drawing = {};
+
+async function getDraw() {
+    drawing = await Drawing.findOne({ name: 'coords1'});
+
+    if (!drawing) {
+        drawing = new Drawing({
+            name: 'coords1',
+            coords: [],
+        });
+
+        await drawing.save();
+    }
+}
+
+getDraw();
 
 mongoose.connect('mongodb://localhost:27017/drawDb', {
     useUnifiedTopology: true,
     useNewUrlParser: true,
 })
-    .then(() => {
-        console.log('DB connected')
-    })
-
-const sessionObject = session({
-    store: new FileStore(),
-    name: 'user_sid',
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true,
-    unset: `destroy`,
-    cookie: {
-        expires: 600000,
-    },
-});
-app.use(cors());
-
-app.use(express.urlencoded({ extended: true}));
-app.use(express.json());
-
-app.use(cookieParser())
-
-io.use(function(socket, next) {
-    sessionObject(socket.request, socket.request.res, next);
-})
-app.use(sessionObject);
-app.get('/', (req, res) =>{
-    res.json(req.session.user)
-})
-app.post('/auth', async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({username})
-    req.session.user = user;
-
-    res.json(req.session.user);
+.then(() => {
+    console.log('DB connected')
 })
 
-app.post('/reg', async (req, res) => {
-    const { username, password } = req.body;
-    const user = new User({
-        username,
-        password,
-    })
-    await user.save();
-    req.session.user = user;
+useMiddleware(app);
 
-    res.json(req.session.user);
-})
+// io.use(function(socket, next) {
+//     sessionObject(socket.request, socket.request.res, next);
+// })
+
 // io.use(sharedsession(sessionObject, cookieParser()));
 
 io.on('connection', (socket) => {
-    socket.emit('newClientConnect', allCoords);
+    socket.emit('newClientConnect', drawing.coords);
     // socket.emit('test', socket.handshake.session.user);
 
-    socket.on('draw', (coords) => {
-        allCoords.push(coords);
+    socket.on('draw', async (coords) => {
+
+        drawing.coords.push(coords);
+        await drawing.save();
         socket.broadcast.emit('draw', coords);
     })
 
-    socket.on('mouseup', () => {
-        allCoords.push(false);
+    socket.on('mouseup', async () => {
+        drawing.coords.push(false);
+        await drawing.save();
         socket.broadcast.emit('mouseup')
     })
 
-    socket.on('clear', () => {
-        allCoords = [];
+    socket.on('clear', async () => {
+        drawing.coords = [];
+        await drawing.save();
         socket.broadcast.emit('clear')
     })
 
