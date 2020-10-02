@@ -14,8 +14,8 @@ const formsRegAuth = document.querySelector('#reg-auth');
 const regForm = document.querySelector('.signup-form');
 const authForm = document.querySelector('.signin-form');
 const usernameNav = document.querySelector('.user-name-nav');
-const logoutBtn = document.querySelector('.logout');
-let currentUser = 'Unknown user';
+// const logoutBtn = document.querySelector('.logout');
+let currentUser = '';
 let isMouseDown = false;
 
 canvas.width = 1300;
@@ -30,8 +30,8 @@ ctx.strokeStyle = colorBrush;
 
 function tog(...elems) {
     elems.forEach((el) => {
-       el.classList.toggle('show');
-       el.classList.toggle('hide');
+        el.classList.toggle('show');
+        el.classList.toggle('hide');
     });
 }
 
@@ -66,26 +66,28 @@ function clear() {
 }
 
 if (regForm) {
-    regForm.addEventListener('submit',  (e) => {
+    regForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const {
-            username: { value: username },
-            password: { value: password },
+            username: {value: username},
+            password: {value: password},
             method
         } = e.target;
 
         fetch('http://localhost:3000/reg', {
             method,
             headers: {'Content-type': 'Application/json'},
-            body: JSON.stringify({ username, password })
-        }).then((us) => {
-            return us.json();
-        }).then((us) => {
-            currentUser = us.username;
-            usernameNav.innerHTML = currentUser;
+            body: JSON.stringify({username, password})
+        }).then((answ) => {
+            return answ.json();
+        }).then((answ) => {
+            if (answ.err) {
+                if (answ.err === 'nameErr') alert('NameError');
+            } else {
+                window.location.href = '/';
+            }
         })
-        tog(formsRegAuth);
 
         // socket.emit('reg', { username, password })
     });
@@ -96,31 +98,28 @@ if (authForm) {
         e.preventDefault();
 
         const {
-            username: { value: username },
-            password: { value: password },
+            username: {value: username},
+            password: {value: password},
             method
         } = e.target;
 
         fetch('http://localhost:3000/auth', {
             method,
             headers: {'Content-type': 'Application/json'},
-            body: JSON.stringify({ username, password })
-        }).then((us) => {
-            return us.json();
-        }).then((us) => {
-            currentUser = us.username;
-            console.log(currentUser)
-            usernameNav.innerHTML = currentUser;
+            body: JSON.stringify({username, password})
+        }).then((answ) => {
+            return answ.json();
+        }).then((answ) => {
+            if (answ.err) {
+                if (answ.err === 'nameErr') alert('NameError');
+                if (answ.err === 'passErr') alert('PasswordError');
+            } else {
+                window.location.href = '/';
+            }
         })
-        tog(formsRegAuth);
         // socket.emit('auth', { username, password })
     });
 }
-
-// logoutBtn.addEventListener('click', (e) => {
-//     e.preventDefault();
-//     socket.emit('logout')
-// })
 
 navWrap.addEventListener('click', (e) => {
     if (e.target.classList.contains('brush')) {
@@ -155,14 +154,16 @@ colorsBox.addEventListener('click', (e) => {
     }
 })
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     M.AutoInit();
 });
 
 window.addEventListener('keypress', (e) => {
     if (e.code === 'KeyD') {
         clear();
-        socket.emit('clear');
+        if (currentUser) {
+            socket.emit('clear');
+        }
     }
 });
 
@@ -181,23 +182,27 @@ canvas.addEventListener('mousemove', (e) => {
         const x = e.pageX - canvasCoords.left;
         const y = e.pageY - canvasCoords.top;
 
-        socket.emit('draw', { x, y, color: colorBrush, size: sizeofbrush, user: currentUser });
+        if (currentUser) {
+            socket.emit('draw', {x, y, color: colorBrush, size: sizeofbrush, user: currentUser});
+        }
         painting(x, y);
     }
 })
 
 socket.on('draw', (coords) => {
-    const { x, y, color, size, user } = coords;
-    colorBrush = color;
-    sizeofbrush = size;
-    paintingUser.style.color = color;
-    paintingUser.innerHTML = `${user} is painting...`
+    if (currentUser) {
+        const {x, y, color, size, user} = coords;
+        colorBrush = color;
+        sizeofbrush = size;
+        paintingUser.style.color = color;
+        paintingUser.innerHTML = `${user} is painting...`
 
-    socket.on('mouseup', () => {
-        paintingUser.innerHTML = '';
-        ctx.beginPath();
-    });
-    painting(x, y);
+        socket.on('mouseup', () => {
+            paintingUser.innerHTML = '';
+            ctx.beginPath();
+        });
+        painting(x, y);
+    }
 });
 
 socket.on('newClientConnect', (allCoords) => {
@@ -213,7 +218,9 @@ socket.on('newClientConnect', (allCoords) => {
 })
 
 socket.on('clear', () => {
-    clear();
+    if (currentUser) {
+        clear();
+    }
 })
 
 socket.on('err', (err) => {
@@ -227,6 +234,8 @@ socket.on('ok', (name) => {
     tog(formsRegAuth);
 })
 
-socket.on('setUserName' , (user) => {
-    currentUser = user.username
+socket.on('setUserName', (user) => {
+    if (user) {
+        currentUser = user.username
+    }
 });

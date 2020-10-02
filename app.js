@@ -3,28 +3,29 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const useMiddleware = require('./middleware/index')
-const Drawing = require('./models/drawing')
-const cookieParser = require('cookie-parser');
-const User = require('./models/user')
+// const Drawing = require('./models/drawing')
+// const cookieParser = require('cookie-parser');
+// const User = require('./models/user')
 
 const port = process.env.PORT || 3000;
-let drawing = {};
+// let drawing = {};
+let allCoords = []
 
 
-async function getDraw() {
-    drawing = await Drawing.findOne({ name: 'coords1'});
-
-    if (!drawing) {
-        drawing = new Drawing({
-            name: 'coords1',
-            coords: [],
-        });
-
-        await drawing.save();
-    }
-}
-
-getDraw();
+// async function getDraw() {
+//     drawing = await Drawing.findOne({ name: 'coords1'});
+//
+//     if (!drawing) {
+//         drawing = new Drawing({
+//             name: 'coords1',
+//             coords: [],
+//         });
+//
+//         await drawing.save();
+//     }
+// }
+//
+// getDraw();
 
 mongoose.connect('mongodb://localhost:27017/drawDb', {
     useUnifiedTopology: true,
@@ -37,25 +38,24 @@ mongoose.connect('mongodb://localhost:27017/drawDb', {
 useMiddleware(app, io);
 
 io.sockets.on('connection', (socket) => {
-    console.log(socket.request.session.user)
     socket.emit('setUserName', socket.request.session.user)
 
-    socket.emit('newClientConnect', drawing.coords);
+    socket.emit('newClientConnect', allCoords);
     socket.on('draw', async (coords) => {
-        drawing.coords.push(coords);
-        await drawing.save();
+        allCoords.push(coords);
+        // await drawing.save();
         socket.broadcast.emit('draw', coords);
     })
 
     socket.on('mouseup', async () => {
-        drawing.coords.push(false);
-        await drawing.save();
+        allCoords.push(false);
+        // await drawing.save();
         socket.broadcast.emit('mouseup')
     })
 
     socket.on('clear', async () => {
-        drawing.coords = [];
-        await drawing.save();
+        allCoords = [];
+        // await drawing.save();
         socket.broadcast.emit('clear')
     })
 
@@ -98,27 +98,19 @@ io.sockets.on('connection', (socket) => {
     // })
 });
 
-function socketKiller(io,idofSocket) {
-
-    let allConnections = io.sockets.connected
-    for (let c in allConnections) {
-        let userSessionId = allConnections[c].conn.request.sessionID;
-        if (idofSocket === userSessionId) {
-            allConnections[c].disconnect()
-        }
-    }
-}
-
-// app.get('/logout', (req, res) => {
-//     socketKiller(io,req.sessionID)
-//     req.session.destroy();
-//     res.clearCookie('user_sid');
-//     console.log('>>>>>>>>>',res.cookies);
-//     res.redirect('/');
-// })
+// function socketKiller(io,idofSocket) {
+//
+//     let allConnections = io.sockets.connected
+//     for (let c in allConnections) {
+//         let userSessionId = allConnections[c].conn.request.sessionID;
+//         if (idofSocket === userSessionId) {
+//             allConnections[c].disconnect()
+//         }
+//     }
+// }
 
 http.listen(port, () => {
     console.log(`Port ${port}`);
 });
 
-module.exports = {io,socketKiller}
+// module.exports = {io,socketKiller}

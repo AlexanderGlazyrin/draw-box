@@ -1,29 +1,42 @@
 const router = require('express').Router();
 const User = require('../models/user');
-// const {io,socketKiller} = require('../app');
 
-router.get('/', (req, res) =>{
+router.get('/', (req, res) => {
     res.render('index');
 })
 
 router.post('/auth', async (req, res) => {
-    const { username, password } = req.body;
+    const {username, password} = req.body;
     const user = await User.findOne({username})
-    req.session.user = user;
-
-    res.json(req.session.user);
+    if (user) {
+        if (password === user.password) {
+            req.session.user = user;
+            res.json(req.session.user);
+        } else {
+            const err = {err: 'passErr'}
+            res.json(err);
+        }
+    } else {
+        const err = {err: 'nameErr'}
+        res.json(err);
+    }
 })
 
 router.post('/reg', async (req, res) => {
-    const { username, password } = req.body;
-    const user = new User({
-        username,
-        password,
-    })
-    await user.save();
-    req.session.user = user;
+    const {username, password} = req.body;
+    if (!await User.findOne({username})) {
+        const user = new User({
+            username,
+            password,
+        })
+        await user.save();
+        req.session.user = user;
+        res.json(req.session.user);
+    } else {
+        const err = {err: 'nameErr'}
+        res.json(err);
+    }
 
-    res.json(req.session.user);
 })
 
 router.get('/logout', (req, res) => {
