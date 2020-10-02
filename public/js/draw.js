@@ -13,8 +13,6 @@ const paintingUser = document.querySelector('.painting-user');
 const formsRegAuth = document.querySelector('#reg-auth');
 const regForm = document.querySelector('.signup-form');
 const authForm = document.querySelector('.signin-form');
-const usernameNav = document.querySelector('.user-name-nav');
-// const logoutBtn = document.querySelector('.logout');
 let currentUser = '';
 let isMouseDown = false;
 
@@ -88,8 +86,6 @@ if (regForm) {
                 window.location.href = '/';
             }
         })
-
-        // socket.emit('reg', { username, password })
     });
 }
 
@@ -117,7 +113,6 @@ if (authForm) {
                 window.location.href = '/';
             }
         })
-        // socket.emit('auth', { username, password })
     });
 }
 
@@ -165,6 +160,9 @@ window.addEventListener('keypress', (e) => {
             socket.emit('clear');
         }
     }
+    if (e.code === 'KeyQ') {
+        hide(formsRegAuth, brushSet);
+    }
 });
 
 canvas.addEventListener('mousedown', () => {
@@ -206,15 +204,17 @@ socket.on('draw', (coords) => {
 });
 
 socket.on('newClientConnect', (allCoords) => {
-    allCoords.forEach((coords) => {
-        if (coords) {
-            colorBrush = coords.color;
-            sizeofbrush = coords.size;
-            painting(coords.x, coords.y)
-        } else {
-            ctx.beginPath();
-        }
-    })
+    if (currentUser) {
+        allCoords.forEach((coords) => {
+            if (coords) {
+                colorBrush = coords.color;
+                sizeofbrush = coords.size;
+                painting(coords.x, coords.y)
+            } else {
+                ctx.beginPath();
+            }
+        })
+    }
 })
 
 socket.on('clear', () => {
