@@ -20,20 +20,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c5510ceb-2b16-4255-b87b-4d2b9c86a592" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/middleware/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/middleware/locals.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/drawing.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/index.hbs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/layout.hbs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/middleware/cleaner.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/draw.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/draw.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middleware/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/draw.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/draw.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sessions/Mj-TJoiMXih7cEJsG46yQD2-N4jT_0xM.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sessions/QA67bFTfCtYzvLj9X_8SIKSishV-dGo-.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/index.hbs" beforeDir="false" afterPath="$PROJECT_DIR$/views/index.hbs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +54,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
@@ -90,7 +86,7 @@
       <option name="presentableId" value="Default" />
       <updated>1601373191672</updated>
       <workItem from="1601373192689" duration="53943000" />
-      <workItem from="1601561596142" duration="12528000" />
+      <workItem from="1601561596142" duration="26694000" />
     </task>
     <servers />
   </component>
@@ -113,9 +109,9 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="320" y="127" width="800" height="711" key="#Intentions/0.23.1440.877/-1920.-157.1920.1057@0.23.1440.877" timestamp="1601380521351" />
-    <state x="385" y="213" key="search.everywhere.popup" timestamp="1601447264572">
+    <state x="385" y="213" key="search.everywhere.popup" timestamp="1601614078692">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state x="385" y="213" key="search.everywhere.popup/0.23.1440.877/-1920.-157.1920.1057@0.23.1440.877" timestamp="1601447264572" />
+    <state x="385" y="213" key="search.everywhere.popup/0.23.1440.877/-1920.-157.1920.1057@0.23.1440.877" timestamp="1601614078692" />
   </component>
 </project>

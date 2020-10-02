@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000');
+const socket = io();
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 const brushSet = document.querySelector('#brush-set');
@@ -13,6 +13,8 @@ const paintingUser = document.querySelector('.painting-user');
 const formsRegAuth = document.querySelector('#reg-auth');
 const regForm = document.querySelector('.signup-form');
 const authForm = document.querySelector('.signin-form');
+const usernameNav = document.querySelector('.user-name-nav');
+const logoutBtn = document.querySelector('.logout');
 let currentUser = 'Unknown user';
 let isMouseDown = false;
 
@@ -81,6 +83,7 @@ if (regForm) {
             return us.json();
         }).then((us) => {
             currentUser = us.username;
+            usernameNav.innerHTML = currentUser;
         })
         tog(formsRegAuth);
 
@@ -106,11 +109,18 @@ if (authForm) {
             return us.json();
         }).then((us) => {
             currentUser = us.username;
+            console.log(currentUser)
+            usernameNav.innerHTML = currentUser;
         })
         tog(formsRegAuth);
         // socket.emit('auth', { username, password })
     });
 }
+
+// logoutBtn.addEventListener('click', (e) => {
+//     e.preventDefault();
+//     socket.emit('logout')
+// })
 
 navWrap.addEventListener('click', (e) => {
     if (e.target.classList.contains('brush')) {
@@ -212,9 +222,11 @@ socket.on('err', (err) => {
     }
 });
 
-// socket.on('ok', (name) => {
-//     currentUser = name;
-//     tog(formsRegAuth);
-// })
+socket.on('ok', (name) => {
+    currentUser = name;
+    tog(formsRegAuth);
+})
 
-socket.on('test' , (username) => console.log(username))
+socket.on('setUserName' , (user) => {
+    currentUser = user.username
+});

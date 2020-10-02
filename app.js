@@ -4,10 +4,12 @@ const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const useMiddleware = require('./middleware/index')
 const Drawing = require('./models/drawing')
-// const sharedsession = require("express-socket.io-session");
+const cookieParser = require('cookie-parser');
+const User = require('./models/user')
 
 const port = process.env.PORT || 3000;
 let drawing = {};
+
 
 async function getDraw() {
     drawing = await Drawing.findOne({ name: 'coords1'});
@@ -32,20 +34,14 @@ mongoose.connect('mongodb://localhost:27017/drawDb', {
     console.log('DB connected')
 })
 
-useMiddleware(app);
+useMiddleware(app, io);
 
-// io.use(function(socket, next) {
-//     sessionObject(socket.request, socket.request.res, next);
-// })
+io.sockets.on('connection', (socket) => {
+    console.log(socket.request.session.user)
+    socket.emit('setUserName', socket.request.session.user)
 
-// io.use(sharedsession(sessionObject, cookieParser()));
-
-io.on('connection', (socket) => {
     socket.emit('newClientConnect', drawing.coords);
-    // socket.emit('test', socket.handshake.session.user);
-
     socket.on('draw', async (coords) => {
-
         drawing.coords.push(coords);
         await drawing.save();
         socket.broadcast.emit('draw', coords);
@@ -63,14 +59,20 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('clear')
     })
 
+    // socket.on('logout', () => {
+    //     console.log(socket.request.sessionID)
+        // socket.request.session.destroy();
+        // socket.request.res.cookies.clearCookie('user_sid');
+
+    // })
+
     // socket.on('auth', async (data) => {
     //     const { username, password } = data;
     //     const user = await User.findOne({username});
     //     if (user) {
     //         if (password === user.password) {
-    //             // socket.handshake.session.user = user;
-    //             // socket.handshake.session.save();
     //             socket.emit('ok', user.username);
+    //             socket.request.res.session.user = user;
     //         } else {
     //             socket.emit('err', 'authErrPass');
     //         }
@@ -78,7 +80,7 @@ io.on('connection', (socket) => {
     //         socket.emit('err', 'authErrName')
     //     }
     // })
-
+    //
     // socket.on('reg', async (data) => {
     //     const { username, password } = data;
     //     const userMongo = await User.findOne({username});
@@ -88,8 +90,6 @@ io.on('connection', (socket) => {
     //             password
     //         })
     //         await user.save();
-    //         socket.handshake.session.user = user;
-    //         socket.handshake.session.save();
     //         socket.emit('ok', username)
     //     } else {
     //         const error = 'regErr'
@@ -98,6 +98,27 @@ io.on('connection', (socket) => {
     // })
 });
 
+function socketKiller(io,idofSocket) {
+
+    let allConnections = io.sockets.connected
+    for (let c in allConnections) {
+        let userSessionId = allConnections[c].conn.request.sessionID;
+        if (idofSocket === userSessionId) {
+            allConnections[c].disconnect()
+        }
+    }
+}
+
+// app.get('/logout', (req, res) => {
+//     socketKiller(io,req.sessionID)
+//     req.session.destroy();
+//     res.clearCookie('user_sid');
+//     console.log('>>>>>>>>>',res.cookies);
+//     res.redirect('/');
+// })
+
 http.listen(port, () => {
     console.log(`Port ${port}`);
 });
+
+module.exports = {io,socketKiller}

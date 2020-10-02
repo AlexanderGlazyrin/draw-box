@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User = require('../models/user');
+// const {io,socketKiller} = require('../app');
 
 router.get('/', (req, res) =>{
     res.render('index');
@@ -23,6 +24,12 @@ router.post('/reg', async (req, res) => {
     req.session.user = user;
 
     res.json(req.session.user);
+})
+
+router.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.clearCookie('user_sid');
+    res.redirect('/');
 })
 
 module.exports = router;

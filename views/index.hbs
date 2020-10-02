@@ -5,15 +5,23 @@
             <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="left hide-on-med-and-down">
                 <li><a class="brush" href="#">Brush</a></li>
-                <li><a class="reg-auth-btn" href="#">Reg/Auth</a></li>
-                <li><a href="#">{{username}}</a></li>
+                {{#if username}}
+                    <li><a class="logout" href="/logout">Log Out</a></li>
+                {{else}}
+                    <li><a class="reg-auth-btn" href="#">Reg / Auth</a></li>
+                {{/if}}
+                    <li><a href="#">{{username}}</a></li>
             </ul>
         </div>
     </nav>
     <ul class="sidenav" id="mobile-demo">
-        <li><a href="#">{{username}}</a></li>
         <li><a class="brush" href="#">Brush</a></li>
-        <li><a class="reg-auth-btn" href="#">Reg/Auth</a></li>
+        {{#if username}}
+            <li><a class="logout" href="/logout">Log Out</a></li>
+        {{else}}
+            <li><a class="reg-auth-btn" href="#">Reg / Auth</a></li>
+        {{/if}}
+        <li><a href="#">{{username}}</a></li>
     </ul>
 </div>
 <div id="cont">
