@@ -73,7 +73,7 @@ if (regForm) {
             method
         } = e.target;
 
-        fetch('http://localhost:3000/reg', {
+        fetch('/reg', {
             method,
             headers: {'Content-type': 'Application/json'},
             body: JSON.stringify({username, password})
@@ -99,7 +99,7 @@ if (authForm) {
             method
         } = e.target;
 
-        fetch('http://localhost:3000/auth', {
+        fetch('/auth', {
             method,
             headers: {'Content-type': 'Application/json'},
             body: JSON.stringify({username, password})
