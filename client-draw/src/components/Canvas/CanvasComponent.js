@@ -1,12 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
 import io from 'socket.io-client';
 import './CanvasComponent.css'
+import {useDispatch, useSelector} from 'react-redux';
+import {clearFalse} from '../../redux/action-creators';
 
 const CanvasComponent = () => {
   const canvasRef = useRef(null);
   const [isMouseDown, changeMouseDown] = useState(false);
+  const {colorBrush, sizeBrush, isClear} = useSelector(state => state);
   const [canvas, setCanvas] = useState({canvas: null, ctx: null, coords: {x: 0, y: 0}});
-  const [socket, setSocket] = useState(null)
+  const [socket, setSocket] = useState(null);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     setSocket(io('http://localhost:4000'));
@@ -18,30 +22,46 @@ const CanvasComponent = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('draw', ({x, y}) => {
-        painting(x, y)
+      socket.on('draw', ({x, y, colorBrush, sizeBrush}) => {
+        painting({x, y, size: sizeBrush, color: colorBrush})
       })
       socket.on('mouseup', () => {
         canvas.ctx.beginPath();
       })
+      socket.on('clear', () => {
+        clear();
+      })
     }
-  }, [socket, canvas.coords.x, canvas.coords.y, canvas.ctx]);
+  }, [socket, canvas.ctx]);
 
-  function painting(x, y) {
+  useEffect(() => {
+    if (isClear) {
+      clear();
+      dispatch(clearFalse())
+      socket.emit('clear')
+    }
+  }, [isClear, dispatch])
 
-    canvas.ctx.lineWidth = 10;
-    canvas.ctx.fillStyle = 'red';
-    canvas.ctx.strokeStyle = 'red';
+  function painting({x, y, size, color}) {
+    canvas.ctx.lineWidth = size * 2;
+    canvas.ctx.fillStyle = color;
+    canvas.ctx.strokeStyle = color;
     canvas.ctx.lineTo(x, y);
     canvas.ctx.stroke();
 
     canvas.ctx.beginPath();
-    canvas.ctx.arc(x, y, 10 / 2, 0, Math.PI * 2);
+    canvas.ctx.arc(x, y, size, 0, Math.PI * 2);
     canvas.ctx.fill();
 
     canvas.ctx.beginPath();
     canvas.ctx.moveTo(x, y);
+  }
 
+  function clear() {
+    canvas.ctx.fillStyle = 'white';
+    canvas.ctx.fillRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+    canvas.ctx.beginPath();
+    canvas.ctx.fillStyle = colorBrush;
   }
 
   const mouseDown = () => {
@@ -56,10 +76,10 @@ const CanvasComponent = () => {
 
   const draw = (e) => {
     if (isMouseDown) {
-      const x = e.clientX - canvas.coords.x;
-      const y = e.clientY - canvas.coords.y;
-      painting(x, y);
-      socket.emit('draw', {x, y})
+      const x = e.pageX - canvas.coords.x;
+      const y = e.pageY - 84;
+      painting({x, y, size: sizeBrush, color: colorBrush});
+      socket.emit('draw', {x, y, colorBrush, sizeBrush})
     }
   }
 
