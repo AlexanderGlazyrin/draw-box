@@ -5,6 +5,7 @@ import CanvasComponent from './components/Canvas/CanvasComponent';
 import TopMenu from './components/TopMenu/TopMenu';
 import ModalBrushMenu from './components/ModalBrushMenu/ModalBrushMenu';
 import ClearButton from './components/ClearButton/ClearButton';
+import BrushButton from './components/BrushButton/BrushButton';
 
 const {Header, Content, Footer} = Layout;
 
@@ -21,6 +22,7 @@ function App() {
               <Col>
                 <CanvasComponent/>
                 <ModalBrushMenu/>
+                <BrushButton/>
                 <ClearButton/>
               </Col>
             </Row>

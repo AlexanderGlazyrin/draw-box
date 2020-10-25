@@ -15,15 +15,16 @@ const CanvasComponent = () => {
   useEffect(() => {
     setSocket(io('http://localhost:4000'));
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d');
+    const ctx2 = canvas.getContext('2d');
     const {x, y} = canvas.getBoundingClientRect();
-    setCanvas({canvas, ctx, coords: {x, y}});
+    setCanvas({canvas, ctx, ctx2, coords: {x, y}});
   }, []);
 
   useEffect(() => {
     if (socket) {
       socket.on('draw', ({x, y, colorBrush, sizeBrush}) => {
-        painting({x, y, size: sizeBrush, color: colorBrush})
+        painting({x, y, size: sizeBrush, color: colorBrush, ctx: canvas.ctx2})
       })
       socket.on('mouseup', () => {
         canvas.ctx.beginPath();
@@ -31,8 +32,18 @@ const CanvasComponent = () => {
       socket.on('clear', () => {
         clear();
       })
+      socket.on('newClientConnect', (allCoords) => {
+        allCoords.forEach(coords => {
+          if (coords) {
+            const {x, y, colorBrush, sizeBrush} = coords;
+            painting({x, y, size: sizeBrush, color: colorBrush})
+          } else {
+            canvas.ctx.beginPath();
+          }
+        })
+      })
     }
-  }, [socket, canvas.ctx]);
+  }, [socket, canvas.ctx, canvas.ctx2]);
 
   useEffect(() => {
     if (isClear) {
@@ -40,21 +51,21 @@ const CanvasComponent = () => {
       dispatch(clearFalse())
       socket.emit('clear')
     }
-  }, [isClear, dispatch])
+  }, [isClear, dispatch, socket])
 
-  function painting({x, y, size, color}) {
-    canvas.ctx.lineWidth = size * 2;
-    canvas.ctx.fillStyle = color;
-    canvas.ctx.strokeStyle = color;
-    canvas.ctx.lineTo(x, y);
-    canvas.ctx.stroke();
+  function painting({x, y, size, color, ctx = canvas.ctx}) {
+    ctx.lineWidth = size * 2;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-    canvas.ctx.beginPath();
-    canvas.ctx.arc(x, y, size, 0, Math.PI * 2);
-    canvas.ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
 
-    canvas.ctx.beginPath();
-    canvas.ctx.moveTo(x, y);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
   }
 
   function clear() {

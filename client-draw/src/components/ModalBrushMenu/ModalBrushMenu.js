@@ -34,7 +34,7 @@ const ModalBrushMenu = () => {
         <Col span={14}>
           <Slider
             min={1}
-            max={20}
+            max={40}
             onChange={value => {
               setOptions(prev => ({...prev, size: value}))
             }}

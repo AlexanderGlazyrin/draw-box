@@ -1,11 +1,6 @@
 .head {
-    padding: 0 50px;
+    padding: 0 150px;
     display: flex;
     justify-content: space-between;
 }
 
-.links {
-    width: 10%;
-    display: flex;
-    justify-content: space-between;
-}

@@ -1,7 +1,6 @@
 import React from 'react';
 import {DeleteOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import style from './ClearButton.module.css'
 import {useDispatch} from 'react-redux';
 import {clearTrue} from '../../redux/action-creators';
 
@@ -10,11 +9,11 @@ const ClearButton = () => {
 
   return (
     <Button
+      style={{position: 'fixed', top: 145, left: 15}}
       type="primary"
       shape="circle"
       icon={<DeleteOutlined />}
       size={'large'}
-      className={style.btn}
       onClick={() => {dispatch(clearTrue())}}
     />
   );

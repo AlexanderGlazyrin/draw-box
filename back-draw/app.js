@@ -18,8 +18,6 @@ mongoose.connect('mongodb+srv://raccoon:1qazxsw2@cluster0.redqk.mongodb.net/draw
 useMiddleware(app, io);
 
 io.sockets.on('connection', (socket) => {
-    socket.emit('setUserName', socket.request.session.user)
-
     socket.emit('newClientConnect', allCoords);
     socket.on('draw', async (coords) => {
         allCoords.push(coords);
