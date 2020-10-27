@@ -12,14 +12,14 @@ const Auth = () => {
 
   const auth = (e) => {
     e.preventDefault();
-    const {password: {value: password}, name: {value: name}} = e.target;
-    dispatch(authUser({password, name}));
+    const {password: {value: password}, name: {value: username}} = e.target;
+    dispatch(authUser({password, username}));
   }
 
   const reg = (e) => {
     e.preventDefault();
-    const {password: {value: password}, name: {value: name}} = e.target;
-    dispatch(regUser({password, name}));
+    const {password: {value: password}, name: {value: username}} = e.target;
+    dispatch(regUser({password, username}));
   }
 
   return (

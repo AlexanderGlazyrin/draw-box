@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import {Col, Layout, Row} from 'antd';
 import CanvasComponent from './components/Canvas/CanvasComponent';
@@ -7,10 +7,21 @@ import ModalBrushMenu from './components/ModalBrushMenu/ModalBrushMenu';
 import ClearButton from './components/ClearButton/ClearButton';
 import BrushButton from './components/BrushButton/BrushButton';
 import Auth from './components/Auth/Auth';
+import {useDispatch} from 'react-redux';
+import {checkToken} from './redux/action-creators';
 
 const {Header, Content, Footer} = Layout;
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!!localStorage.length) {
+      const token = JSON.parse(localStorage.userData).token;
+      dispatch(checkToken(token));
+    }
+  }, [dispatch]);
+
   return (
     <>
       <BrowserRouter>

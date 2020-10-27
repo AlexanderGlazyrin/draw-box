@@ -1,7 +1,7 @@
 import {
   AUTH_USER,
   CHANGE_COLOR_BRUSH,
-  CHANGE_SIZE_BRUSH,
+  CHANGE_SIZE_BRUSH, CHECK_TOKEN,
   CLEAR_FALSE,
   CLEAR_TRUE, GET_USER, LOGOUT_USER,
   REG_USER, REMOVE_USER, SET_USER,
@@ -77,5 +77,12 @@ export const logoutUser = () => {
 export const removeUser = () => {
   return {
     type: REMOVE_USER,
+  }
+}
+
+export const checkToken = (payload) => {
+  return {
+    type: CHECK_TOKEN,
+    payload
   }
 }

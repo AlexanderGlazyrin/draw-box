@@ -7,7 +7,7 @@ const useMiddleware = require('./middleware')
 const port = process.env.PORT || 4000;
 let allCoords = []
 
-mongoose.connect('mongodb+srv://raccoon:1qazxsw2@cluster0.redqk.mongodb.net/drawDb', {
+mongoose.connect(process.env.MONGO, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
 })
