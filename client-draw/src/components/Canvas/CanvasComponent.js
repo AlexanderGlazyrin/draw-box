@@ -7,7 +7,7 @@ import {clearFalse} from '../../redux/action-creators';
 const CanvasComponent = () => {
   const canvasRef = useRef(null);
   const [isMouseDown, changeMouseDown] = useState(false);
-  const {colorBrush, sizeBrush, isClear} = useSelector(state => state);
+  const {colorBrush, sizeBrush, isClear, profile} = useSelector(state => state);
   const [canvas, setCanvas] = useState({canvas: null, ctx: null, coords: {x: 0, y: 0}});
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch()
@@ -16,15 +16,16 @@ const CanvasComponent = () => {
     setSocket(io('http://localhost:4000'));
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const ctx2 = canvas.getContext('2d');
     const {x, y} = canvas.getBoundingClientRect();
-    setCanvas({canvas, ctx, ctx2, coords: {x, y}});
+    setCanvas({canvas, ctx, coords: {x, y}});
   }, []);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('draw', ({x, y, colorBrush, sizeBrush}) => {
-        painting({x, y, size: sizeBrush, color: colorBrush, ctx: canvas.ctx2})
+    if (socket && profile) {
+      socket.on('draw', ({x, y, colorBrush, sizeBrush, drawingUser}) => {
+        const ctx = canvas.canvas.getContext('2d');
+        console.log(drawingUser);
+        painting({x, y, size: sizeBrush, color: colorBrush, ctx})
       })
       socket.on('mouseup', () => {
         canvas.ctx.beginPath();
@@ -43,13 +44,15 @@ const CanvasComponent = () => {
         })
       })
     }
-  }, [socket, canvas.ctx, canvas.ctx2]);
+  }, [socket, canvas.ctx]);
 
   useEffect(() => {
     if (isClear) {
       clear();
       dispatch(clearFalse())
-      socket.emit('clear')
+      if (profile) {
+        socket.emit('clear')
+      }
     }
   }, [isClear, dispatch, socket])
 
@@ -82,7 +85,9 @@ const CanvasComponent = () => {
   const mouseUp = () => {
     changeMouseDown(false);
     canvas.ctx.beginPath();
-    socket.emit('mouseup');
+    if (profile) {
+      socket.emit('mouseup');
+    }
   }
 
   const draw = (e) => {
@@ -90,7 +95,9 @@ const CanvasComponent = () => {
       const x = e.pageX - canvas.coords.x;
       const y = e.pageY - 84;
       painting({x, y, size: sizeBrush, color: colorBrush});
-      socket.emit('draw', {x, y, colorBrush, sizeBrush})
+      if (profile) {
+        socket.emit('draw', {x, y, colorBrush, sizeBrush, drawingUser: profile.username})
+      }
     }
   }
 

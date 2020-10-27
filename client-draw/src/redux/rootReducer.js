@@ -13,7 +13,7 @@ const initialState = {
   colorBrush: 'black',
   sizeBrush: 10,
   isClear: false,
-  profile: {},
+  profile: null,
 }
 
 export const rootReducer = (state = initialState, action) => {
@@ -31,7 +31,7 @@ export const rootReducer = (state = initialState, action) => {
     case SET_USER:
       return {...state, profile: action.payload};
     case REMOVE_USER:
-      return {...state, profile: {}};
+      return {...state, profile: null};
     default:
       return state;
   }

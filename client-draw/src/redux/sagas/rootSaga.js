@@ -1,5 +1,5 @@
 import {call, put, takeEvery, all} from 'redux-saga/effects';
-import {AUTH_USER, CHECK_TOKEN, LOGOUT_USER, REG_USER} from '../types';
+import {AUTH_USER, CHECK_TOKEN, REG_USER} from '../types';
 import {setUser} from '../action-creators';
 
 function* regSagaWorker({payload}) {
@@ -9,7 +9,7 @@ function* regSagaWorker({payload}) {
       headers: {'Content-type': 'Application/json'},
       body: JSON.stringify(payload),
     })).json();
-  })
+  });
   if (!response.error) {
     yield put(setUser(response.user));
     yield localStorage.setItem(
