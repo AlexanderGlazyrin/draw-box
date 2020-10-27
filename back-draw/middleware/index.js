@@ -4,23 +4,16 @@ const FileStore = require('session-file-store')(session);
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
-const indexRouter = require('../routes/index');
-const { setLocalVariable } = require('./locals');
+const indexRouter = require('../routes');
 const cookieCleaner = require('./cleaner');
-const socketKiller = require('../app');
 
 module.exports = (app, io) => {
 
-
-
     app.use(cors());
-
-    app.set('view engine', 'hbs');
-    app.set('views', path.join(__dirname, '..', 'views'))
 
     app.use(express.urlencoded({ extended: true}));
     app.use(express.json());
-    app.use(express.static(path.join(__dirname, '..', 'public')))
+    // app.use(express.static(path.join(__dirname, '..', 'public')))
 
     app.use(cookieParser())
 
@@ -31,7 +24,7 @@ module.exports = (app, io) => {
         resave: true,
         saveUninitialized: false,
         cookie: {
-            expires: 600000,
+            expires: 6000000,
         },
     });
 
@@ -41,7 +34,6 @@ module.exports = (app, io) => {
 
     app.use(sessionObject);
 
-    app.use(setLocalVariable);
     app.use(cookieCleaner)
 
     app.use(indexRouter);

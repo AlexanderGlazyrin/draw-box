@@ -1,0 +1,7 @@
+.ant-radio-button-inner {
+    visibility: hidden;
+}
+
+.ant-radio-button-checked {
+    border: 3px solid #1890ff;
+}
