@@ -1,4 +1,12 @@
-import {CHANGE_COLOR_BRUSH, CHANGE_SIZE_BRUSH, CLEAR_FALSE, CLEAR_TRUE, TOGGLE_BRUSH_MENU} from './types';
+import {
+  AUTH_USER,
+  CHANGE_COLOR_BRUSH,
+  CHANGE_SIZE_BRUSH,
+  CLEAR_FALSE,
+  CLEAR_TRUE, GET_USER, LOGOUT_USER,
+  REG_USER, REMOVE_USER, SET_USER,
+  TOGGLE_BRUSH_MENU,
+} from './types';
 
 export const changeColor = (payload) => {
   return {
@@ -29,5 +37,45 @@ export const clearTrue = () => {
 export const clearFalse = () => {
   return {
     type: CLEAR_FALSE
+  }
+}
+
+export const authUser = (payload) => {
+  return {
+    type: AUTH_USER,
+    payload
+  }
+}
+
+export const regUser = (payload) => {
+  return {
+    type: REG_USER,
+    payload
+  }
+}
+
+export const setUser = (payload) => {
+  return {
+    type: SET_USER,
+    payload
+  }
+}
+
+export const getUser = (payload) => {
+  return {
+    type: GET_USER,
+    payload
+  }
+}
+
+export const logoutUser = () => {
+  return {
+    type: LOGOUT_USER,
+  }
+}
+
+export const removeUser = () => {
+  return {
+    type: REMOVE_USER,
   }
 }

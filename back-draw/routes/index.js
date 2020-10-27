@@ -2,24 +2,13 @@ const router = require('express').Router();
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
-// router.get('/', (req, res) => {
-//     res.render('index');
-// })
-
 router.post('/auth', async (req, res) => {
     const {username, password} = req.body;
     const user = await User.findOne({username})
     if (user) {
-        if (await bcrypt.compare(password, user.password)) {
-            req.session.user = user;
-            res.json(req.session.user);
-        } else {
-            const err = {err: 'passErr'}
-            res.json(err);
-        }
+
     } else {
-        const err = {err: 'nameErr'}
-        res.json(err);
+
     }
 })
 
@@ -32,11 +21,8 @@ router.post('/reg', async (req, res) => {
             password: hashedPassword,
         })
         await user.save();
-        req.session.user = user;
-        res.json(req.session.user);
     } else {
-        const err = {err: 'nameErr'}
-        res.json(err);
+
     }
 
 })

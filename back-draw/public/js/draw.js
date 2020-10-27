@@ -10,7 +10,7 @@ const colorsBox = document.querySelector('#colors');
 const check = document.querySelector('.check');
 const navWrap = document.querySelector('.nav-wrapper');
 const paintingUser = document.querySelector('.painting-user');
-const formsRegAuth = document.querySelector('#reg-auth');
+const formsRegAuth = document.querySelector('#reg-Auth');
 const regForm = document.querySelector('.signup-form');
 const authForm = document.querySelector('.signin-form');
 let currentUser = '';
@@ -120,7 +120,7 @@ navWrap.addEventListener('click', (e) => {
     if (e.target.classList.contains('brush')) {
         tog(brushSet);
     }
-    if (e.target.classList.contains('reg-auth-btn')) {
+    if (e.target.classList.contains('reg-Auth-btn')) {
         tog(formsRegAuth);
     }
 });

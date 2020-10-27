@@ -1,10 +1,19 @@
-import {CHANGE_COLOR_BRUSH, CHANGE_SIZE_BRUSH, CLEAR_FALSE, CLEAR_TRUE, TOGGLE_BRUSH_MENU} from './types';
+import {
+  CHANGE_COLOR_BRUSH,
+  CHANGE_SIZE_BRUSH,
+  CLEAR_FALSE,
+  CLEAR_TRUE,
+  REMOVE_USER,
+  SET_USER,
+  TOGGLE_BRUSH_MENU,
+} from './types';
 
 const initialState = {
   showBrushMenu: false,
   colorBrush: 'black',
   sizeBrush: 10,
   isClear: false,
+  profile: {},
 }
 
 export const rootReducer = (state = initialState, action) => {
@@ -16,9 +25,13 @@ export const rootReducer = (state = initialState, action) => {
     case TOGGLE_BRUSH_MENU:
       return {...state, showBrushMenu: !state.showBrushMenu};
     case CLEAR_TRUE:
-      return {...state, isClear: true}
+      return {...state, isClear: true};
     case CLEAR_FALSE:
-      return {...state, isClear: false}
+      return {...state, isClear: false};
+    case SET_USER:
+      return {...state, profile: action.payload};
+    case REMOVE_USER:
+      return {...state, profile: {}};
     default:
       return state;
   }
