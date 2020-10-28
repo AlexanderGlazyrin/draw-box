@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import io from 'socket.io-client';
 import './CanvasComponent.css'
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,6 +12,28 @@ const CanvasComponent = () => {
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch()
 
+  const painting = useCallback(({x, y, size, color, ctx = canvas.ctx}) => {
+    ctx.lineWidth = size * 2;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }, [canvas.ctx])
+
+  const clear = useCallback(() => {
+    canvas.ctx.fillStyle = 'white';
+    canvas.ctx.fillRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+    canvas.ctx.beginPath();
+    canvas.ctx.fillStyle = colorBrush;
+  }, [canvas.ctx, canvas.canvas, colorBrush])
+
   useEffect(() => {
     setSocket(io('http://localhost:4000'));
     const canvas = canvasRef.current;
@@ -24,7 +46,6 @@ const CanvasComponent = () => {
     if (socket && profile) {
       socket.on('draw', ({x, y, colorBrush, sizeBrush, drawingUser}) => {
         const ctx = canvas.canvas.getContext('2d');
-        console.log(drawingUser);
         painting({x, y, size: sizeBrush, color: colorBrush, ctx})
       })
       socket.on('mouseup', () => {
@@ -44,7 +65,7 @@ const CanvasComponent = () => {
         })
       })
     }
-  }, [socket, canvas.ctx]);
+  }, [socket, canvas.ctx, canvas.canvas, clear, painting, profile]);
 
   useEffect(() => {
     if (isClear) {
@@ -54,29 +75,7 @@ const CanvasComponent = () => {
         socket.emit('clear')
       }
     }
-  }, [isClear, dispatch, socket])
-
-  function painting({x, y, size, color, ctx = canvas.ctx}) {
-    ctx.lineWidth = size * 2;
-    ctx.fillStyle = color;
-    ctx.strokeStyle = color;
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  }
-
-  function clear() {
-    canvas.ctx.fillStyle = 'white';
-    canvas.ctx.fillRect(0, 0, canvas.canvas.width, canvas.canvas.height);
-    canvas.ctx.beginPath();
-    canvas.ctx.fillStyle = colorBrush;
-  }
+  }, [isClear, dispatch, socket, clear, profile])
 
   const mouseDown = () => {
     changeMouseDown(true);

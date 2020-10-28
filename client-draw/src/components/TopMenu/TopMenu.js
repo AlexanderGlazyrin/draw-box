@@ -14,14 +14,14 @@ const TopMenu = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <div className={style.head}>
         <h2 style={{color: 'white'}}><Link to='/'>DrawBox</Link></h2>
         {user ?
           <Link to='#' onClick={logout}>Log Out</Link> :
           <Link to='/auth'>Log In</Link>}
       </div>
-    </React.Fragment>
+    </>
   );
 };
 
